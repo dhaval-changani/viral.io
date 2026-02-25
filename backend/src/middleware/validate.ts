@@ -8,11 +8,11 @@ import { ZodType, ZodError } from 'zod';
 export function validate(schema: ZodType) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const validated = await schema.parseAsync({
+      const validated = (await schema.parseAsync({
         body: req.body,
         query: req.query,
         params: req.params,
-      }) as { body?: any; query?: any; params?: any };
+      })) as { body?: any; query?: any; params?: any };
 
       // Replace request objects with validated data
       if (validated.body !== undefined) {
@@ -21,11 +21,14 @@ export function validate(schema: ZodType) {
 
       next();
     } catch (error) {
+      console.log(`🚀 | validate.ts:9 | validate | error|`, error);
+
       if (error instanceof ZodError) {
         const errors = error.issues.map((err) => ({
           field: err.path.join('.'),
           message: err.message,
         }));
+        console.log(`🚀 | validate.ts:31 | validate | errors|`, errors)
 
         res.status(400).json({
           success: false,

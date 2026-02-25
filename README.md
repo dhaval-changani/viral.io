@@ -1,2 +1,4 @@
 # viral.io
-Takes in a idea and generates youtube videos from the scratch
+
+This is an automated finance video generation system that uses AI to create engaging video content with script generation, voice synthesis, B-roll, and music composition.
+

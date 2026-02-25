@@ -48,23 +48,23 @@ const nodeEnv = (process.env.NODE_ENV ?? 'development') as EnvConfig['NODE_ENV']
 export const env: EnvConfig = {
   NODE_ENV: nodeEnv,
   PORT: parsePort(process.env.PORT),
-  CORS_ORIGIN: process.env.CORS_ORIGIN ?? '*',
+  CORS_ORIGIN: requireEnv('CORS_ORIGIN'),
   MONGODB_URI: requireEnv('MONGODB_URI'),
   // AI
-  OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
+  OPENAI_API_KEY: requireEnv('OPENAI_API_KEY'),
   // ElevenLabs TTS
-  ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY ?? '',
-  ELEVENLABS_VOICE_ID: process.env.ELEVENLABS_VOICE_ID ?? '',
+  ELEVENLABS_API_KEY: requireEnv('ELEVENLABS_API_KEY'),
+  ELEVENLABS_VOICE_ID: requireEnv('ELEVENLABS_VOICE_ID'),
   // Runway Gen-3 Alpha Turbo (B-roll)
-  RUNWAY_API_KEY: process.env.RUNWAY_API_KEY ?? '',
+  RUNWAY_API_KEY: requireEnv('RUNWAY_API_KEY'),
   // Epidemic Sound (music)
-  EPIDEMIC_SOUND_API_KEY: process.env.EPIDEMIC_SOUND_API_KEY ?? '',
+  EPIDEMIC_SOUND_API_KEY: requireEnv('EPIDEMIC_SOUND_API_KEY'),
   // YouTube Data API v3 + OAuth2
-  YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY ?? '',
-  YOUTUBE_CLIENT_ID: process.env.YOUTUBE_CLIENT_ID ?? '',
-  YOUTUBE_CLIENT_SECRET: process.env.YOUTUBE_CLIENT_SECRET ?? '',
-  YOUTUBE_REFRESH_TOKEN: process.env.YOUTUBE_REFRESH_TOKEN ?? '',
+  YOUTUBE_API_KEY: requireEnv('YOUTUBE_API_KEY'),
+  YOUTUBE_CLIENT_ID: requireEnv('YOUTUBE_CLIENT_ID'),
+  YOUTUBE_CLIENT_SECRET: requireEnv('YOUTUBE_CLIENT_SECRET'),
+  YOUTUBE_REFRESH_TOKEN: requireEnv('YOUTUBE_REFRESH_TOKEN'),
   // JWT
-  JWT_SECRET: process.env.JWT_SECRET ?? 'dev-secret-change-me',
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN ?? '7d',
+  JWT_SECRET: requireEnv('JWT_SECRET'),
+  JWT_EXPIRES_IN: requireEnv('JWT_EXPIRES_IN'),
 };

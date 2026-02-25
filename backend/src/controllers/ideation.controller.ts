@@ -29,6 +29,7 @@ export async function generateIdeasController(
 ) {
   try {
     const validated = GenerateIdeasRequestSchema.parse(req.body);
+    console.log(`🚀 | ideation.controller.ts:32 | generateIdeasController | validated|`, validated)
 
     logger.info(`[Controller] Generating ideas for topic: "${validated.topic}"`);
 
