@@ -22,8 +22,11 @@ export async function createUser(req: Request, res: Response, next: NextFunction
 
 export async function listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10));
-    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '20'), 10)));
+    // After validation middleware, query params are transformed to numbers
+    const page = req.query.page as unknown as number;
+    console.log(`🚀 | user.controller.ts:27 | listUsers | page|`, page)
+    const limit = req.query.limit as unknown as number;
+    console.log(`🚀 | user.controller.ts:29 | listUsers | limit|`, limit)
 
     const { users, pagination } = await userService.listUsers(page, limit);
 
@@ -41,7 +44,7 @@ export async function listUsers(req: Request, res: Response, next: NextFunction)
 
 export async function getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const user = await userService.getUserById(req.params.id);
+    const user = await userService.getUserById(req.params.id as string);
 
     const response: ApiResponse<UserPublic> = {
       success: true,
@@ -57,7 +60,7 @@ export async function getUserById(req: Request, res: Response, next: NextFunctio
 export async function updateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const dto: UpdateUserDto = req.body;
-    const user = await userService.updateUser(req.params.id, dto);
+    const user = await userService.updateUser(req.params.id as string, dto);
 
     const response: ApiResponse<UserPublic> = {
       success: true,
@@ -73,7 +76,7 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
 
 export async function deleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    await userService.deleteUser(req.params.id);
+    await userService.deleteUser(req.params.id as string);
 
     const response: ApiResponse = {
       success: true,

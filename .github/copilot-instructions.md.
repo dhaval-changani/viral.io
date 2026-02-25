@@ -1,0 +1,119 @@
+# GitHub Copilot Instructions — Finance Video Generator
+
+## Project Overview
+
+Automated AI-powered finance video creation system.
+**Stack:** TypeScript · Node.js v20+ · Remotion · Vercel AI SDK + GPT-4o · ElevenLabs · Runway · Epidemic Sound · Sharp · Express.js · Zod
+
+## Pipeline
+
+```
+Script (generateObject + Zod) → Audio (ElevenLabs) + B-roll (Runway / Sharp fallback) → Compose (Remotion)
+```
+
+## Critical Rules
+
+### ✅ Always use `generateObject()` with Zod schemas
+```typescript
+import { generateObject } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { z } from 'zod';
+
+const { object } = await generateObject({
+  model: openai('gpt-4o'),
+  schema: z.object({
+    scenes: z.array(z.object({
+      id: z.number(),
+      description: z.string(),
+      duration: z.number(),
+      voiceScript: z.string(),
+    })),
+    musicGenre: z.string(),
+  }),
+  prompt: "Generate a finance video script...",
+});
+```
+
+❌ Never use `generateText()` or parse unstructured text.
+
+### ✅ Always use environment variables
+```typescript
+const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) throw new Error('OPENAI_API_KEY not set');
+```
+
+### ✅ Exponential backoff for ElevenLabs 429s
+```typescript
+for (let i = 0; i < 5; i++) {
+  try {
+    return await elevenLabsClient.textToSpeech.convert({ text, voice_id });
+  } catch (e: any) {
+    if (e.status === 429 && i < 4) await new Promise(r => setTimeout(r, 2 ** i * 1000));
+    else throw e;
+  }
+}
+```
+
+### ✅ Verify assets before Remotion render
+```typescript
+import { existsSync } from 'fs';
+const source = existsSync(videoPath) ? videoPath : '#FF6B6B'; // color fallback
+```
+
+### ✅ Respect Epidemic Sound rate-limit headers
+```typescript
+const remaining = parseInt(res.headers.get('X-RateLimit-Remaining') || '0');
+const reset = parseInt(res.headers.get('X-RateLimit-Reset') || '0');
+if (remaining < 10) await new Promise(r => setTimeout(r, reset - Date.now()));
+```
+
+## Script Hooks (use one per video)
+
+| Hook | Style |
+|------|-------|
+| Fortune Teller | Predictive/forecasting |
+| Experimenter | Trial & discovery |
+| Teacher | Educational, instructional |
+| Magician | Surprising reveal |
+| Investigator | Detective/investigation |
+| Contrarian | Challenging assumptions |
+
+## TypeScript Conventions
+
+- Strict mode: `"strict": true`
+- Always define return types; use `const` over `let`, never `var`
+- Use `interface` for object shapes, `type` for unions/primitives
+- Validate all API responses with Zod before use
+
+## Project Structure
+
+```
+/src/agents        # AI scripting & ideation
+/src/remotion      # Video composition components
+/src/utils         # Asset downloaders, image processing
+/assets/           # audio/, images/, temp/
+/backend/src/      # config/, controllers/, middleware/,
+                   # models/, routes/, schemas/, services/, types/
+```
+
+## Required Environment Variables
+
+```env
+OPENAI_API_KEY=
+ELEVENLABS_API_KEY=
+ELEVENLABS_VOICE_ID=
+RUNWAY_API_KEY=
+EPIDEMIC_SOUND_API_KEY=
+NODE_ENV=development
+```
+
+## Key Targets
+
+- Videos: 8+ minutes, 20+ scenes
+- Currency: USD (`$`), 2 decimal places
+- Audience: US, UK, Canada, Australia
+- Never commit `.env` to git
+
+---
+
+*Last Updated: February 25, 2026*
