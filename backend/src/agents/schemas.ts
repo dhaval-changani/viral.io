@@ -143,3 +143,176 @@ export const IdeationResponseSchema = z.object({
 });
 
 export type IdeationResponse = z.infer<typeof IdeationResponseSchema>;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Script Generation Schemas
+// Output of ScriptGenerationModule — consumed by ElevenLabs, Runway, Remotion
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Background music mood per scene — maps to Epidemic Sound mood filter
+ */
+export const SceneMoodEnum = z.enum([
+  'tense',
+  'uplifting',
+  'neutral',
+  'dramatic',
+  'inspiring',
+  'suspenseful',
+  'calm',
+  'urgent',
+]);
+
+export type SceneMood = z.infer<typeof SceneMoodEnum>;
+
+/**
+ * Scene-to-scene transition type
+ */
+export const SceneTransitionEnum = z.enum([
+  'cut',
+  'fade',
+  'dissolve',
+  'wipe',
+  'zoom',
+]);
+
+export type SceneTransition = z.infer<typeof SceneTransitionEnum>;
+
+/**
+ * VideoSceneSchema
+ * One atomic scene unit in the final video.
+ * Maps directly to:
+ *  - Remotion <Sequence> frame range (scene_number, duration_seconds)
+ *  - ElevenLabs TTS input (spoken_script)
+ *  - Runway Gen-3 Alpha Turbo prompt (b_roll_prompt)
+ *  - Remotion compositor layout (visual_description, on_screen_text)
+ *  - Epidemic Sound filter (background_music_mood)
+ */
+export const VideoSceneSchema = z.object({
+  scene_number: z
+    .number()
+    .int()
+    .min(1)
+    .describe('Sequential scene index starting at 1'),
+
+  duration_seconds: z
+    .number()
+    .min(5)
+    .max(60)
+    .describe(
+      'Scene duration in seconds. Hook scenes: 5–10s. Body scenes: 20–40s. CTA: 10–15s.'
+    ),
+
+  spoken_script: z
+    .string()
+    .min(10)
+    .max(600)
+    .describe(
+      'Narration text for ElevenLabs TTS. Must be natural, speakable, and match visual_description. No stage directions.'
+    ),
+
+  visual_description: z
+    .string()
+    .min(10)
+    .max(300)
+    .describe(
+      'Remotion compositor layout. Describe what appears on screen: subject, motion, framing, text overlay positions. Example: "Full-screen B-roll of stock chart crashing. Lower-third: HUGE RISK."'
+    ),
+
+  b_roll_prompt: z
+    .string()
+    .min(10)
+    .max(400)
+    .describe(
+      'Runway Gen-3 Alpha Turbo prompt. Format: [subject] + [motion verb] + [camera angle] + [lighting/mood]. Example: "Close-up of hands shredding a credit card, slow motion, shallow depth of field, dramatic side lighting."'
+    ),
+
+  background_music_mood: SceneMoodEnum.describe(
+    'Emotional tone for background music. Maps to Epidemic Sound mood filter.'
+  ),
+
+  on_screen_text: z
+    .string()
+    .max(80)
+    .optional()
+    .describe(
+      'Optional caption or text overlay. Max 80 chars. Use for key stats, emphasis words, or chapter titles. Skip for conversational scenes.'
+    ),
+
+  transition: SceneTransitionEnum.optional().describe(
+    'Transition to next scene. Use "cut" for fast-paced content; "fade" for emotional beats.'
+  ),
+});
+
+export type VideoScene = z.infer<typeof VideoSceneSchema>;
+
+/**
+ * YouTube chapter marker for automatic chapter detection
+ * First marker must always be at timestamp_seconds: 0
+ */
+const ChapterMarkerSchema = z.object({
+  timestamp_seconds: z
+    .number()
+    .int()
+    .min(0)
+    .describe('Absolute timestamp in seconds from video start. First marker must be 0.'),
+  title: z
+    .string()
+    .max(60)
+    .describe('Chapter title shown in YouTube timeline. Short, descriptive, like a subheading.'),
+});
+
+/**
+ * FullVideoScriptSchema
+ * Complete render-ready script for a finance YouTube video.
+ * Output of ScriptGenerationModule — consumed by:
+ *  1. ElevenLabs TTS pipeline (spoken_script per scene)
+ *  2. Runway Gen-3 Alpha Turbo (b_roll_prompt per scene)
+ *  3. Remotion compositor (all fields for frame-accurate rendering)
+ */
+export const FullVideoScriptSchema = z.object({
+  video_title: z
+    .string()
+    .max(100)
+    .describe('Final video title. Should match or refine the source ViralVideo title.'),
+
+  total_duration_seconds: z
+    .number()
+    .min(480)
+    .max(1800)
+    .describe(
+      'Total video duration in seconds. Target: 480–900s (8–15 min) for maximum mid-roll ad revenue on finance content. sum(scene.duration_seconds) should equal this value ±5s.'
+    ),
+
+  scenes: z
+    .array(VideoSceneSchema)
+    .min(20)
+    .max(60)
+    .describe(
+      'Ordered array of video scenes. Must include: hook (scene 1), hook reinforcement (scenes 2–4), content body, and CTA (final scene). scene_number values must be sequential starting at 1.'
+    ),
+
+  intro_hook_reinforcement: z
+    .string()
+    .max(300)
+    .describe(
+      'A 30–60 second post-hook statement reinforcing the curiosity gap without resolving it. Example: "And by the end of this video, you will know exactly how to use this — legally — before the window closes."'
+    ),
+
+  call_to_action: z
+    .string()
+    .max(200)
+    .describe(
+      'Final 15–30 second CTA script. Must be topic-specific (not generic "like and subscribe"). Drive: subscribe, like, comment, or watch next video.'
+    ),
+
+  chapter_markers: z
+    .array(ChapterMarkerSchema)
+    .min(3)
+    .max(15)
+    .describe(
+      'YouTube chapter markers in ascending timestamp order. First marker MUST be at timestamp_seconds: 0. Enables YouTube auto-chapters.'
+    ),
+});
+
+export type FullVideoScript = z.infer<typeof FullVideoScriptSchema>;
