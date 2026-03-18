@@ -80,7 +80,6 @@ describe('ViralIdeationModule', () => {
       const ideas = await generateViralIdeas(topic, {
         temperature: 0.5,
         modelId: 'gpt-4o',
-        maxTokens: 3000,
       });
 
       expect(ideas.ideas.length).toBeGreaterThanOrEqual(3);

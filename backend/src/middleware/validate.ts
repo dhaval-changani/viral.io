@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { ZodType, ZodError } from 'zod';
+import { logger } from '../utils/logger';
 
 /**
  * Middleware to validate request data against a Zod schema
@@ -21,14 +22,14 @@ export function validate(schema: ZodType) {
 
       next();
     } catch (error) {
-      console.log(`🚀 | validate.ts:9 | validate | error|`, error);
+      logger.debug(`[validate] error`, error);
 
       if (error instanceof ZodError) {
         const errors = error.issues.map((err) => ({
           field: err.path.join('.'),
           message: err.message,
         }));
-        console.log(`🚀 | validate.ts:31 | validate | errors|`, errors)
+        logger.debug(`[validate] validation errors`, errors);
 
         res.status(400).json({
           success: false,

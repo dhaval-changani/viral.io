@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import * as userService from '../services/user.service';
 import type { ApiResponse, CreateUserDto, UpdateUserDto, PaginatedResponse } from '../types';
 import type { UserPublic } from '../types';
+import { logger } from '../utils/logger';
 
 export async function createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -24,9 +25,9 @@ export async function listUsers(req: Request, res: Response, next: NextFunction)
   try {
     // After validation middleware, query params are transformed to numbers
     const page = req.query.page as unknown as number;
-    console.log(`🚀 | user.controller.ts:27 | listUsers | page|`, page)
+    logger.debug(`[Controller] listUsers page`, page);
     const limit = req.query.limit as unknown as number;
-    console.log(`🚀 | user.controller.ts:29 | listUsers | limit|`, limit)
+    logger.debug(`[Controller] listUsers limit`, limit);
 
     const { users, pagination } = await userService.listUsers(page, limit);
 

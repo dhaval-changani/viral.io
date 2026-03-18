@@ -41,7 +41,7 @@ const userSchema = new Schema<IUser>(
 
 // Never return passwordHash in JSON output
 userSchema.set('toJSON', {
-  transform(_doc, ret) {
+  transform(_doc, ret: Record<string, unknown>) {
     delete ret.passwordHash;
     return ret;
   },

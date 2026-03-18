@@ -10,7 +10,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
     const user = await userService.verifyCredentials(dto.email, dto.password);
 
     const token = jwt.sign({ sub: user._id.toString() }, env.JWT_SECRET, {
-      expiresIn: env.JWT_EXPIRES_IN,
+      expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     });
 
     const response: ApiResponse<LoginResponse> = {
