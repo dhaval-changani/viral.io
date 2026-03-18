@@ -37,13 +37,13 @@ Tracks all pending work for the viral.io backend pipeline.
 
 ---
 
-## 🟡 Stage 3 — Asset Generation (Not Started)
+## 🟡 Stage 3 — Asset Generation (In Progress)
 
 ### ElevenLabs TTS
-- [ ] Create `ElevenLabsService` (`src/services/elevenlabs.service.ts`)
-- [ ] Implement exponential backoff on 429s (5 retries, `2^i * 1000ms` delay)
-- [ ] Add `POST /api/v1/assets/tts` endpoint — accepts `ScriptRecord` id, generates audio per scene
-- [ ] Store audio file URLs on `ScriptRecord`
+- [x] Create `ElevenLabsService` (`src/services/elevenlabs.service.ts`)
+- [x] Implement exponential backoff on 429s (5 retries, `2^i * 1000ms` delay)
+- [x] Add `POST /api/v1/assets/tts` endpoint — accepts `ScriptRecord` id, generates audio per scene
+- [x] Store audio file URLs on `ScriptRecord`
 
 ### Runway Gen-3 Alpha Turbo (B-roll)
 - [ ] Create `RunwayService` (`src/services/runway.service.ts`)

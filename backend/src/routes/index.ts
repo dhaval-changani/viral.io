@@ -4,6 +4,7 @@ import userRoutes from './user.routes';
 import authRoutes from './auth.routes';
 import ideationRoutes from './ideation.routes';
 import scriptRoutes from './script.routes';
+import assetsRoutes from './assets.routes';
 
 const router = Router();
 
@@ -12,5 +13,6 @@ router.use('/users', userRoutes);
 router.use('/auth', authRoutes);
 router.use('/ideation', ideationRoutes);
 router.use('/script', scriptRoutes);
+router.use('/assets', assetsRoutes);
 
 export default router;

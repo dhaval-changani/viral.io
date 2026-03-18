@@ -8,6 +8,7 @@ export interface IScriptRecord extends Document {
   modelId: string;
   temperature: number;
   result: FullVideoScript;
+  audioUrls: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -40,6 +41,10 @@ const scriptRecordSchema = new Schema<IScriptRecord>(
     result: {
       type: Schema.Types.Mixed,
       required: true,
+    },
+    audioUrls: {
+      type: [String],
+      default: [],
     },
   },
   { timestamps: true },
