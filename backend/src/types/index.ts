@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
+import type { UserRole } from '../models/User';
 
 // Standard API response envelope
 export interface ApiResponse<T = unknown> {
@@ -52,6 +53,7 @@ export interface UserPublic {
   firstName: string;
   lastName: string;
   email: string;
+  role: UserRole;
   createdAt: string;
   updatedAt: string;
 }
@@ -59,4 +61,15 @@ export interface UserPublic {
 export interface LoginResponse {
   token: string;
   user: UserPublic;
+}
+
+// JWT payload stored in the token
+export interface JwtPayload {
+  sub: string; // user._id
+  role: UserRole;
+}
+
+// Express Request extended with authenticated user
+export interface AuthenticatedRequest extends Request {
+  user: JwtPayload;
 }

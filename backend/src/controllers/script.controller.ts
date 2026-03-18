@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { generateScript } from '../agents';
 import { ViralVideoSchema } from '../agents/schemas';
+import { ScriptRecord } from '../models/ScriptRecord';
 import { logger } from '../utils/logger';
+import type { AuthenticatedRequest } from '../types';
 
 /**
  * Request validation schema for POST /api/v1/script/generate
@@ -73,6 +75,18 @@ export async function generateScriptController(
       temperature: validated.temperature,
     });
 
+    const userId = (req as AuthenticatedRequest).user?.sub ?? null;
+    ScriptRecord.create({
+      userId,
+      ideaRecordId: null,
+      idea: validated.idea,
+      modelId: validated.modelId,
+      temperature: validated.temperature,
+      result: script,
+    }).catch((err: unknown) => {
+      logger.error('[Controller] Failed to save ScriptRecord:', err);
+    });
+
     res.status(200).json({
       success: true,
       data: script,
@@ -118,4 +132,41 @@ export async function scriptHealthController(_req: Request, res: Response) {
     status: 'operational',
     timestamp: new Date().toISOString(),
   });
+}
+
+/**
+ * GET /api/v1/script/history
+ * Return saved script records for the authenticated user, newest first.
+ * Query params: page (default 1), limit (default 20, max 100)
+ */
+export async function scriptHistoryController(req: Request, res: Response) {
+  try {
+    const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10));
+    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '20'), 10)));
+    const skip = (page - 1) * limit;
+
+    const userId = (req as AuthenticatedRequest).user.sub;
+
+    const [records, total] = await Promise.all([
+      ScriptRecord.find({ userId }).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      ScriptRecord.countDocuments({ userId }),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: records,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    logger.error('[Controller] Error fetching script history:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error fetching history',
+    });
+  }
 }

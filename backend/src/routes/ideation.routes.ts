@@ -1,13 +1,27 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import {
   generateIdeasController,
   batchGenerateIdeasController,
   ideationHealthController,
+  ideationHistoryController,
 } from '../controllers/ideation.controller';
 import { validate } from '../middleware/validate';
+import { authenticate } from '../middleware/auth';
+import type { AuthenticatedRequest } from '../types';
 import { z } from 'zod';
 
 const ideationRouter = Router();
+
+// Per-user rate limit: 20 AI generation requests per 15 minutes
+const aiRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  keyGenerator: (req) => (req as AuthenticatedRequest).user?.sub ?? req.ip ?? 'unknown',
+  message: { success: false, error: 'Too many requests. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Request validation schemas
 const GenerateIdeasSchema = z.object({
@@ -54,69 +68,37 @@ const BatchGenerateSchema = z.object({
 /**
  * POST /api/ideation/generate
  * Generate viral video ideas for a single finance topic
- *
- * @example
- * POST /api/ideation/generate
- * Content-Type: application/json
- *
- * {
- *   "topic": "Credit Cards",
- *   "temperature": 0.7,
- *   "maxTokens": 4000
- * }
- *
- * Response:
- * {
- *   "success": true,
- *   "data": {
- *     "topic_analysis": "...",
- *     "ideas": [
- *       {
- *         "title": "...",
- *         "hook_script": {...},
- *         "primal_desire": "...",
- *         ...
- *       }
- *     ]
- *   }
- * }
  */
-ideationRouter.post('/generate', validate(GenerateIdeasSchema), generateIdeasController);
+ideationRouter.post(
+  '/generate',
+  authenticate,
+  aiRateLimit,
+  validate(GenerateIdeasSchema),
+  generateIdeasController,
+);
 
 /**
  * POST /api/ideation/batch
  * Generate viral video ideas for multiple finance topics
- *
- * @example
- * POST /api/ideation/batch
- * Content-Type: application/json
- *
- * {
- *   "topics": ["Credit Cards", "Side Hustles", "Tax Hacks"],
- *   "concurrency": 3,
- *   "temperature": 0.7
- * }
- *
- * Response:
- * {
- *   "success": true,
- *   "data": {
- *     "successful": [...],
- *     "failed": [...]
- *   },
- *   "summary": {
- *     "totalTopics": 3,
- *     "successful": 3,
- *     "failed": 0
- *   }
- * }
  */
-ideationRouter.post('/batch', validate(BatchGenerateSchema), batchGenerateIdeasController);
+ideationRouter.post(
+  '/batch',
+  authenticate,
+  aiRateLimit,
+  validate(BatchGenerateSchema),
+  batchGenerateIdeasController,
+);
 
 /**
  * GET /api/ideation/health
- * Health check for the ideation service
+ * Health check for the ideation service (public)
  */
 ideationRouter.get('/health', ideationHealthController);
+
+/**
+ * GET /api/ideation/history
+ * Return paginated ideation records for the authenticated user
+ */
+ideationRouter.get('/history', authenticate, ideationHistoryController);
 
 export default ideationRouter;

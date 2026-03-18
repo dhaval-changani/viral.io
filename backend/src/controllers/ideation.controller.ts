@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { generateViralIdeas, generateViralIdeasBatch } from '../agents';
+import { IdeaRecord } from '../models/IdeaRecord';
 import { logger } from '../utils/logger';
+import type { AuthenticatedRequest } from '../types';
 
 // Request validation schemas
 const GenerateIdeasRequestSchema = z.object({
@@ -36,6 +38,17 @@ export async function generateIdeasController(
     const ideas = await generateViralIdeas(validated.topic, {
       modelId: validated.modelId,
       temperature: validated.temperature,
+    });
+
+    const userId = (req as AuthenticatedRequest).user?.sub ?? null;
+    IdeaRecord.create({
+      userId,
+      topic: validated.topic,
+      modelId: validated.modelId,
+      temperature: validated.temperature,
+      result: ideas,
+    }).catch((err: unknown) => {
+      logger.error('[Controller] Failed to save IdeaRecord:', err);
     });
 
     res.status(200).json({
@@ -121,4 +134,41 @@ export async function ideationHealthController(_req: Request, res: Response) {
     status: 'operational',
     timestamp: new Date().toISOString(),
   });
+}
+
+/**
+ * GET /api/ideation/history
+ * Return saved ideation records for the authenticated user, newest first.
+ * Query params: page (default 1), limit (default 20, max 100)
+ */
+export async function ideationHistoryController(req: Request, res: Response) {
+  try {
+    const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10));
+    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '20'), 10)));
+    const skip = (page - 1) * limit;
+
+    const userId = (req as AuthenticatedRequest).user.sub;
+
+    const [records, total] = await Promise.all([
+      IdeaRecord.find({ userId }).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      IdeaRecord.countDocuments({ userId }),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: records,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    logger.error('[Controller] Error fetching ideation history:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error fetching history',
+    });
+  }
 }

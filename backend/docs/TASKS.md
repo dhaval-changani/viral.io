@@ -18,22 +18,22 @@ Tracks all pending work for the viral.io backend pipeline.
 
 ## 🟠 Auth & Security
 
-- [ ] Create JWT verification middleware (`src/middleware/auth.ts`)
-- [ ] Protect `/ideation/*` and `/script/*` routes with JWT middleware
-- [ ] Add user signup endpoint (`POST /api/v1/auth/register`)
-- [ ] Add role-based access control (RBAC) skeleton for future admin vs. user roles
-- [ ] Add per-user rate limiting on AI generation endpoints
+- [x] Create JWT verification middleware (`src/middleware/auth.ts`)
+- [x] Protect `/ideation/*` and `/script/*` routes with JWT middleware
+- [x] Add user signup endpoint (`POST /api/v1/auth/register`)
+- [x] Add role-based access control (RBAC) skeleton for future admin vs. user roles
+- [x] Add per-user rate limiting on AI generation endpoints
 
 ---
 
 ## 🟠 Data Persistence
 
-- [ ] Create `IdeaRecord` Mongoose model — stores generated ideas linked to user + timestamp
-- [ ] Create `ScriptRecord` Mongoose model — stores generated scripts linked to `IdeaRecord`
-- [ ] Create `RenderJob` Mongoose model — tracks render/upload job status
-- [ ] Add save-to-DB logic in `ideation.controller.ts` after successful generation
-- [ ] Add save-to-DB logic in `script.controller.ts` after successful generation
-- [ ] Add history endpoints: `GET /ideation/history`, `GET /script/history`
+- [x] Create `IdeaRecord` Mongoose model — stores generated ideas linked to user + timestamp
+- [x] Create `ScriptRecord` Mongoose model — stores generated scripts linked to `IdeaRecord`
+- [x] Create `RenderJob` Mongoose model — tracks render/upload job status
+- [x] Add save-to-DB logic in `ideation.controller.ts` after successful generation
+- [x] Add save-to-DB logic in `script.controller.ts` after successful generation
+- [x] Add history endpoints: `GET /ideation/history`, `GET /script/history`
 
 ---
 

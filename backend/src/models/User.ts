@@ -1,10 +1,13 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export type UserRole = 'user' | 'admin';
+
 export interface IUser extends Document {
   firstName: string;
   lastName: string;
   email: string;
   passwordHash: string;
+  role: UserRole;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,6 +36,11 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: [true, 'Password is required'],
     },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
   },
   {
     timestamps: true,
@@ -41,9 +49,10 @@ const userSchema = new Schema<IUser>(
 
 // Never return passwordHash in JSON output
 userSchema.set('toJSON', {
-  transform(_doc, ret: Record<string, unknown>) {
-    delete ret.passwordHash;
-    return ret;
+  transform(_doc, ret) {
+    const obj = ret as unknown as Record<string, unknown>;
+    delete obj['passwordHash'];
+    return obj;
   },
 });
 
