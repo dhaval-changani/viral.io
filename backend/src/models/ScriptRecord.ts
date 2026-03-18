@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import type { FullVideoScript, ViralVideo } from '../agents/schemas';
+import type { EpidemicTrack } from '../services/epidemic.service';
 
 export interface IScriptRecord extends Document {
   userId: mongoose.Types.ObjectId | null;
@@ -9,6 +10,8 @@ export interface IScriptRecord extends Document {
   temperature: number;
   result: FullVideoScript;
   audioUrls: string[];
+  brollUrls: string[];
+  musicTrack: EpidemicTrack | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,6 +48,14 @@ const scriptRecordSchema = new Schema<IScriptRecord>(
     audioUrls: {
       type: [String],
       default: [],
+    },
+    brollUrls: {
+      type: [String],
+      default: [],
+    },
+    musicTrack: {
+      type: Schema.Types.Mixed,
+      default: null,
     },
   },
   { timestamps: true },

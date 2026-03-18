@@ -35,6 +35,7 @@ Tracks all pending work for the viral.io backend pipeline.
 - [x] Add save-to-DB logic in `script.controller.ts` after successful generation
 - [x] Add history endpoints: `GET /ideation/history`, `GET /script/history`
 
+
 ---
 
 ## 🟡 Stage 3 — Asset Generation (In Progress)
@@ -46,18 +47,18 @@ Tracks all pending work for the viral.io backend pipeline.
 - [x] Store audio file URLs on `ScriptRecord`
 
 ### Runway Gen-3 Alpha Turbo (B-roll)
-- [ ] Create `RunwayService` (`src/services/runway.service.ts`)
-- [ ] Implement parallel batch processing of `b_roll_prompt` per scene
-- [ ] Handle async job polling (Runway returns job ID, not immediate output)
-- [ ] Add `POST /api/v1/assets/broll` endpoint
-- [ ] Store b-roll video URLs on `ScriptRecord`
+- [x] Create `RunwayService` (`src/services/runway.service.ts`)
+- [x] Implement parallel batch processing of `b_roll_prompt` per scene
+- [x] Handle async job polling (Runway returns job ID, not immediate output)
+- [x] Add `POST /api/v1/assets/broll` endpoint
+- [x] Store b-roll video URLs on `ScriptRecord`
 
 ### Epidemic Sound (Background Music)
-- [ ] Create `EpidemicSoundService` (`src/services/epidemic.service.ts`)
-- [ ] Implement music search/selection by `background_music_mood`
-- [ ] Monitor `X-RateLimit-Remaining` header; delay requests if `< 10`
-- [ ] Add `POST /api/v1/assets/music` endpoint
-- [ ] Store selected track info on `ScriptRecord`
+- [x] Create `EpidemicSoundService` (`src/services/epidemic.service.ts`)
+- [x] Implement music search/selection by `background_music_mood`
+- [x] Monitor `X-RateLimit-Remaining` header; delay requests if `< 10`
+- [x] Add `POST /api/v1/assets/music` endpoint
+- [x] Store selected track info on `ScriptRecord`
 
 ---
 
