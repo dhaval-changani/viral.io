@@ -65,12 +65,12 @@ Tracks all pending work for the viral.io backend pipeline.
 ## 🟡 Stage 4 — Rendering & Upload (Not Started)
 
 ### Remotion Rendering
-- [ ] Set up Remotion project inside `backend/` or as a separate workspace
-- [ ] Implement scene-to-frame composition using `visual_description` fields
-- [ ] Sync audio duration with scene `duration_seconds` (frame-accurate)
-- [ ] Validate all asset paths with `existsSync`; fall back to CSS hex color on failure
-- [ ] Add `POST /api/v1/render` endpoint — triggers Remotion render job
-- [ ] Store output MP4 path on `RenderJob`
+- [x] Set up Remotion project inside `backend/remotion/` (package.json, tsconfig, React compositions)
+- [x] Implement scene-to-frame composition using `visual_description` fields (`FullVideo.tsx`, `VideoScene.tsx`)
+- [x] Sync audio duration with scene `duration_seconds` (frame-accurate: `durationInFrames = duration_seconds * 30`)
+- [x] Validate all asset paths with `existsSync`; fall back to CSS hex color on failure (`remotion.service.ts`)
+- [x] Add `POST /api/v1/render` endpoint — triggers Remotion render job + `GET /api/v1/render/:jobId` for status
+- [x] Store output MP4 path on `RenderJob` (`outputPath` field added to model)
 
 ### YouTube Upload
 - [ ] Implement OAuth2 flow for YouTube channel authorization

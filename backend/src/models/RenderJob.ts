@@ -14,6 +14,7 @@ export interface IRenderJob extends Document {
   scriptRecordId: mongoose.Types.ObjectId;
   status: RenderJobStatus;
   videoTitle: string;
+  outputPath: string | null;
   error: string | null;
   youtubeVideoId: string | null;
   youtubeUrl: string | null;
@@ -53,6 +54,10 @@ const renderJobSchema = new Schema<IRenderJob>(
     videoTitle: {
       type: String,
       required: true,
+    },
+    outputPath: {
+      type: String,
+      default: null,
     },
     error: {
       type: String,
