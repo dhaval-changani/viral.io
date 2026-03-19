@@ -73,12 +73,12 @@ Tracks all pending work for the viral.io backend pipeline.
 - [x] Store output MP4 path on `RenderJob` (`outputPath` field added to model)
 
 ### YouTube Upload
-- [ ] Implement OAuth2 flow for YouTube channel authorization
-- [ ] Create `YouTubeService` (`src/services/youtube.service.ts`)
-- [ ] Add `POST /api/v1/upload` endpoint — uploads rendered MP4 with metadata
-- [ ] Enforce manual review gate: only publish after explicit `POST /api/v1/publish/:jobId`
-- [ ] Enforce 1-video-at-a-time cadence
-- [ ] Enrich metadata: title, description (SEO), tags, category (Finance)
+- [x] Implement OAuth2 flow for YouTube channel authorization (`refreshAccessToken` in `youtube.service.ts`)
+- [x] Create `YouTubeService` (`src/services/youtube.service.ts`)
+- [x] Add `POST /api/v1/upload` endpoint — uploads rendered MP4 with metadata
+- [x] Enforce manual review gate: only publish after explicit `POST /api/v1/upload/publish/:jobId`
+- [x] Enforce 1-video-at-a-time cadence
+- [x] Enrich metadata: title, description (SEO), tags, category (Finance)
 
 ---
 

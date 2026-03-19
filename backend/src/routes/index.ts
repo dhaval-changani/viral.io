@@ -6,6 +6,7 @@ import ideationRoutes from './ideation.routes';
 import scriptRoutes from './script.routes';
 import assetsRoutes from './assets.routes';
 import renderRoutes from './render.routes';
+import uploadRoutes from './upload.routes';
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use('/ideation', ideationRoutes);
 router.use('/script', scriptRoutes);
 router.use('/assets', assetsRoutes);
 router.use('/render', renderRoutes);
+router.use('/upload', uploadRoutes);
 
 export default router;
